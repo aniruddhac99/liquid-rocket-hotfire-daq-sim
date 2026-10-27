@@ -1,4 +1,4 @@
-# Rocket Engine Hot-Fire DAQ Simulator
+# liquid-rocket-hotfire-daq-sim
 
 **LabVIEW-based data acquisition, monitoring, and simulated flow-control system for a liquid rocket engine hot-fire test.**
 
