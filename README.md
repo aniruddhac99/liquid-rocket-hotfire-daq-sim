@@ -416,7 +416,6 @@ The current implementation does not provide:
 
 All pressure signals and control responses are simulated.
 
-**This framework must not be used to control real rocket engines or hazardous equipment without separately engineered, independently validated hardware and safety systems.**
 
 ---
 
@@ -424,14 +423,8 @@ All pressure signals and control responses are simulated.
 
 `liquid-rocket-hotfire-daq-sim` demonstrates a modular approach to LabVIEW-based data acquisition and supervisory monitoring through four Virtual Instruments and a Python telemetry source.
 
-The implementation covers synthetic pressure generation, TCP data reception, waveform visualization, communication-error handling, simulated emergency-stop logic and preliminary main DAQ logging.
+This framework covers synthetic pressure generation, TCP data reception, waveform visualization, communication-error handling, simulated emergency-stop logic and preliminary main DAQ logging.
 
-While full system integration and hardware validation remain future work, the prototype establishes a foundation for discussing DAQ architecture, signal acquisition, fault handling, control-state management, data recording, and instrumentation scalability.
+
 
 ---
-
-**Project:** Data Acquisition Assignment — Hathor Rockets  
-**Author:** Aniruddha Prabhash Chakravarty  
-**Domain:** Liquid Rocket Propulsion | Ground-Test Instrumentation | DAQ Simulation  
-**Technologies:** LabVIEW 2026, Python, NumPy, TCP/IP  
-**Status:** Four-VI Software Prototype
