@@ -1,6 +1,6 @@
 # liquid-rocket-hotfire-daq-sim
 
-**A modular LabVIEW–Python framework for simulated liquid rocket engine ground-test data acquisition, telemetry monitoring, flow-control logic, and data logging.**
+**A modular LabVIEW–Python framework for simulated liquid rocket engine ground-test data acquisition, telemetry monitoring, flow-control logic, & data logging.**
 
 ## Overview
 
