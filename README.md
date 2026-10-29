@@ -195,7 +195,7 @@ The prototype does **not** implement NI-DAQmx device acquisition, deterministic 
 
 ---
 
-## 10. Conclusion
+## 8. Conclusion
 
 `liquid-rocket-hotfire-daq-sim` demonstrates a modular approach to LabVIEW-based data acquisition and supervisory monitoring through four Virtual Instruments and a Python telemetry source.
 
