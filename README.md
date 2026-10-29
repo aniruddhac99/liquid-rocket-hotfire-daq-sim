@@ -428,3 +428,54 @@ This framework covers synthetic pressure generation, TCP data reception, wavefor
 
 
 ---
+
+
+## LabVIEW Implementation & Validation
+
+The following screenshots document the LabVIEW virtual instruments developed for the software-only hot-fire DAQ demonstrator.
+
+### 1. Simulated Pressure
+
+**Figure 1 — Pressure Monitoring Front Panel**
+
+![Figure 1 - Pressure Monitoring Front Panel](docs/images/Simulated_Pressure_Front_Panel.png)
+
+**Figure 2 — Pressure Simulation Block Diagram**
+
+![Figure 2 - Pressure Simulation Block Diagram](docs/images/Simulated_Pressure_Block_Diagram.png)
+
+### 2. TCP Acquisition
+
+**Figure 3 — TCP Acquisition Front Panel**
+
+![Figure 3 - TCP Acquisition Front Panel](docs/images/TCP_Acquisition_Front_Panel.png)
+
+**Figure 4 — TCP Acquisition Block Diagram**
+
+![Figure 4 - TCP Acquisition Block Diagram](docs/images/TCP_Acquisition_Block_Diagram.png)
+
+**Figure 5 — Python TCP Telemetry Server Output**
+
+![Figure 5 - Python TCP Telemetry Server Output](docs/images/TCP_Acquisition_Server_Log.png)
+
+### 3. Flow Control & Emergency Stop
+
+**Figure 6 — Flow Control Front Panel**
+
+![Figure 6 - Flow Control Front Panel](docs/images/Flow_Control_Front_Panel.png)
+
+**Figure 7 — Emergency Stop Demonstration**
+
+![Figure 7 - Emergency Stop Demonstration](docs/images/Flow_Control_Front_Panel_Emergency_Stop.png)
+
+**Figure 8 — Flow Control Block Diagram**
+
+![Figure 8 - Flow Control Block Diagram](docs/images/Flow_Control_Block_Diagram.png)
+
+### 4. DAQ Main — Integration Work in Progress
+
+**Figure 9 — DAQ Main Block Diagram (Partial Implementation)**
+
+![Figure 9 - DAQ Main Block Diagram](docs/images/DAQ_Main_Block_Diagram.png)
+
+**Implementation status:** Standalone pressure simulation, TCP acquisition and flow-control demonstrations are implemented. Full integration and end-to-end logging in DAQ_Main.vi remain unvalidated. This software demonstrator is not a hardware-qualified safety system.
