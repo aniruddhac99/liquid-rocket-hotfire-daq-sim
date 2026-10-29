@@ -23,398 +23,174 @@ The objective is to demonstrate the fundamental architecture and engineering con
 
 ## 1. System Architecture
 
-The framework is organized into four logical layers: telemetry generation, data acquisition, monitoring and control, and supervisory logging.
-
-### 1.1 High-Level Design (HLD)
-
 ```mermaid
-flowchart TD
-    subgraph SIM["PYTHON SIMULATION LAYER"]
-        PY["Synthetic Pressure Generator"]
-        SERVER["TCP Telemetry Server"]
-        PY --> SERVER
+%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Arial", "fontSize": "14px", "primaryColor": "#f4f7fb", "primaryTextColor": "#172b4d", "primaryBorderColor": "#6b829c", "lineColor": "#66788a", "clusterBkg": "#ffffff", "clusterBorder": "#cbd5e1"}, "flowchart": {"curve": "basis", "nodeSpacing": 30, "rankSpacing": 45}}}%%
+flowchart TB
+    subgraph SOURCE["Python telemetry source"]
+        direction TB
+        PY["Synthetic pressure generator"] --> SERVER["TCP server"]
     end
-
-    subgraph ACQ["LABVIEW ACQUISITION LAYER"]
-        TCP["TCP_Acquisition.vi"]
-        DISPLAY["Received Pressure Display"]
-        TCP --> DISPLAY
+    subgraph ACQ["LabVIEW acquisition"]
+        direction TB
+        TCP["TCP_Acquisition.vi"] --> READOUT["Pressure readout"]
     end
-
-    subgraph CONTROL["MONITORING & CONTROL"]
+    subgraph LOCAL["Standalone LabVIEW demonstrations"]
+        direction LR
         PRESS["Simulated_Pressure.vi"]
         FLOW["Flow_Control.vi"]
     end
-
-    subgraph SUP["TEST SUPERVISION & LOGGING"]
-        MAIN["DAQ_Main.vi"]
-        LOG[("Timestamped Log Files")]
-        MAIN -.-> LOG
+    subgraph FUTURE["Partial integration"]
+        direction TB
+        MAIN["DAQ_Main.vi"] -.-> LOG[("Timestamped logs")]
     end
-
-    SERVER -->|"TCP 127.0.0.1:5000"| TCP
-
+    SERVER -->|"TCP · 127.0.0.1:5000"| TCP
     TCP -.-> MAIN
     PRESS -.-> MAIN
     FLOW -.-> MAIN
-
-    classDef python fill:#dbeafe,stroke:#2563eb,color:#1e3a8a
-    classDef labview fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e
-    classDef safety fill:#fef3c7,stroke:#d97706,color:#92400e
-    classDef logging fill:#dcfce7,stroke:#16a34a,color:#166534
-
-    class PY,SERVER python
-    class TCP,DISPLAY,PRESS,MAIN labview
-    class FLOW safety
-    class LOG logging
+    classDef node fill:#f4f7fb,stroke:#6b829c,color:#172b4d,stroke-width:1px
+    class PY,SERVER,TCP,READOUT,PRESS,FLOW,MAIN,LOG node
 ```
 
-**Architecture interpretation**
+**Figure 1.** System-level architecture. Solid lines denote the tested TCP telemetry path; dashed lines denote unvalidated integration or logging paths. The pressure and flow-control VIs are independently operated.
 
-- Solid connections represent the demonstrated Python-to-LabVIEW telemetry path.
-- Dashed connections represent conceptual subsystem integration or functionality not fully verified end to end.
-- Individual VIs can be tested independently.
-- The current system does not implement a fully coordinated, hardware-backed acquisition sequence.
+## 2. Implementation Status
 
-This modular approach allows individual subsystems to be developed and evaluated before full integration.
+| Component | Demonstrated function | Status |
+|:--|:--|:--|
+| `daq_sim/tcp_server.py` | Synthetic pressure streaming over TCP | Implemented |
+| `Simulated_Pressure.vi` | Pressure chart and threshold-based alarm | Tested |
+| `TCP_Acquisition.vi` | Pressure readout and basic connection-error handling | Tested |
+| `Flow_Control.vi` | Operator stop and latched emergency-stop logic | Tested |
+| `DAQ_Main.vi` | Main monitoring and timestamped logging design | Partial; full logging unverified |
 
----
+The demonstrated pressure signal is approximately **2.0–2.2 bar**. The Python source nominally transmits at **10 Hz**. Multichannel acquisition, synchronized test sequencing, and physical NI-DAQ hardware are outside the implemented scope.
 
-## 2. Framework Components
+## 3. LabVIEW Implementation Evidence
 
-### 2.1 Synthetic Pressure Monitoring
+### 3.1 Simulated Pressure
 
-**Virtual Instrument:** `Simulated_Pressure.vi`
+Generates a local synthetic pressure waveform, displays it continuously, and evaluates an overpressure threshold.
 
-Demonstrates local pressure-signal generation and monitoring using LabVIEW.
+![Simulated pressure front panel](docs/images/Simulated_Pressure_Front_Panel.png)
 
-**Implemented functions:**
+*Figure 2. Simulated Pressure — front panel showing the pressure chart and overpressure indicator.*
 
-- Synthetic pressure generation.
-- Continuous waveform visualization.
-- Pressure display in bar.
-- Threshold comparison.
-- Boolean overpressure indication.
+![Simulated pressure block diagram](docs/images/Simulated_Pressure_Block_Diagram.png)
 
-The observed simulation operates around **2.0–2.2 bar**.
+*Figure 3. Simulated Pressure — LabVIEW signal generation and threshold-comparison logic.*
 
-This VI demonstrates the signal-processing and visualization concepts used in instrumentation monitoring.
+### 3.2 TCP Acquisition
 
-It operates independently of the TCP acquisition interface.
+Receives pressure samples from the Python server on `127.0.0.1:5000`. Basic error handling terminates acquisition on a communication fault.
 
-### 2.2 TCP Telemetry Acquisition
+![TCP acquisition front panel](docs/images/TCP_Acquisition_Front_Panel.png)
 
-**Virtual Instrument:** `TCP_Acquisition.vi`
+*Figure 4. TCP Acquisition — live received-pressure display.*
 
-Establishes communication between a Python telemetry source and LabVIEW.
+![TCP acquisition block diagram](docs/images/TCP_Acquisition_Block_Diagram.png)
 
-**Implemented functions:**
+*Figure 5. TCP Acquisition — connection, read loop, error handling, and cleanup.*
 
-- TCP connection to a local telemetry server.
-- Reception of synthetic pressure measurements.
-- Numerical pressure display.
-- Basic communication-error handling.
-- Acquisition loop termination following communication failure.
+![TCP server log](docs/images/TCP_Acquisition_Server_Log.png)
 
-The Python server supplies a single pressure channel over `127.0.0.1:5000`.
+*Figure 6. Python telemetry server — terminal output from the acquisition test.*
 
-The nominal simulator is designed to produce samples at approximately **10 Hz**, with pressure centered near 2.1 bar.
+### 3.3 Flow Control and Emergency Stop
 
-**Current limitations:** The protocol does not include channel identifiers or source timestamps. Robust message framing, automatic reconnection, and stale-data handling remain future improvements.
+Implements simulated operator-stop logic and a retained emergency-stop state during execution. No physical valves are actuated.
 
-### 2.3 Simulated Flow Control
+![Flow control front panel](docs/images/Flow_Control_Front_Panel.png)
 
-**Virtual Instrument:** `Flow_Control.vi`
+*Figure 7. Flow Control — operator interface under normal simulation conditions.*
 
-Demonstrates operator-stop and emergency-stop behavior using LabVIEW Boolean functions and state management.
+![Flow control emergency stop](docs/images/Flow_Control_Front_Panel_Emergency_Stop.png)
 
-**Implemented functions:**
+*Figure 8. Flow Control — emergency-stop demonstration.*
 
-- Operator-initiated stop conditions.
-- Emergency-stop input.
-- Boolean OR-based shutdown logic.
-- Shift-register state retention.
-- Latched emergency-stop behavior.
-- Simulation loop termination.
+![Flow control block diagram](docs/images/Flow_Control_Block_Diagram.png)
 
-The emergency-stop state remains latched during the execution cycle and resets when a new execution begins.
+*Figure 9. Flow Control — Boolean shutdown logic and state retention.*
 
-This demonstrates how a control system can retain a shutdown condition rather than relying solely on a momentary input.
+### 3.4 Main DAQ Prototype
 
-**Scope:** The VI demonstrates simulated control logic. Physical valve actuation, mass-flow computation, mixture-ratio control, and hardware interlocks are not implemented.
+`DAQ_Main.vi` contains preliminary monitoring and file-handling logic. File creation, repeated timestamped writes, and complete integration have **not** been verified.
 
-### 2.4 Main DAQ and Data Logging
+![Main DAQ block diagram](docs/images/DAQ_Main_Block_Diagram.png)
 
-**Virtual Instrument:** `DAQ_Main.vi`
+*Figure 10. DAQ Main — partial integration and logging block diagram.*
 
-Introduces a centralized LabVIEW workflow for simulated telemetry monitoring and file-logging integration.
+## 4. Acquisition Capacity Estimate
 
-**Development scope:**
+The following values are **design targets**, not measured prototype capacity.
 
-- Main VI execution structure.
-- Simulated pressure generation and display.
-- Monitoring interface.
-- Preliminary file-handling logic.
-- Run-specific timestamped logging design.
+| I/O group | Channels | Sample rate |
+|:--|--:|--:|
+| Slow analog inputs | 50 | 1 kHz |
+| Fast analog inputs | 25 | 50 kHz |
+| Digital inputs | 30 | — |
+| Digital outputs | 30 | — |
+| Analog outputs | 2 | — |
 
-The intended logging workflow is:
+For 16-bit analog samples, the theoretical uncompressed throughput is
 
-```text
-Start DAQ Run
-      |
-Generate Run Timestamp
-      |
-Construct Log File Path
-      |
-Acquire / Generate Sample
-      |
-Write Measurement
-      |
-Stop & Close File
-```
+$$
+R = N f_s B
+$$
 
-This represents the logging design rather than a completely validated data-recording pipeline.
+where $N$ is the channel count, $f_s$ is the sample rate in samples/s, and $B=2\ \mathrm{bytes/sample}$.
 
-Full verification of file creation, timestamp formatting, repeated sample writes, and safe resource closure remains pending.
+**Slow analog channels:**
 
----
+$$
+R_{\mathrm{slow}} = 50(1{,}000)(2) = 100{,}000\ \mathrm{bytes/s}
+$$
 
-## 3. Current Implementation Status
+**Fast analog channels:**
 
-| Component | Responsibility | Status |
-|---|---|---|
-| `daq_sim/tcp_server.py` | Synthetic pressure generation and TCP streaming | Implemented |
-| `Simulated_Pressure.vi` | Pressure waveform and overpressure monitoring | Tested |
-| `TCP_Acquisition.vi` | TCP pressure reception and error handling | Tested |
-| `Flow_Control.vi` | Operator stop and emergency-stop latch | Tested |
-| `DAQ_Main.vi` | Main monitoring and logging workflow | Prototype |
-| Multichannel telemetry | Multiple pressure, temperature, and flow sensors | Planned |
-| NI hardware acquisition | Physical or NI-simulated DAQ devices | Not implemented |
-| Automated test sequencing | Coordinated system state machine | Planned |
+$$
+R_{\mathrm{fast}} = 25(50{,}000)(2) = 2{,}500{,}000\ \mathrm{bytes/s}
+$$
 
-The implementation prioritizes fundamental DAQ concepts and subsystem-level behavior over extensive hardware integration.
+**Total raw analog throughput:**
 
----
+$$
+\boxed{R_{\mathrm{total}} = 2.6\ \mathrm{MB/s}}
+$$
 
-## 4. Running the Simulator
+This estimate excludes metadata, timestamps, digital I/O, protocol overhead, and storage overhead. Practical deployment would require appropriate buffering, timing synchronization, and sustained-write validation.
 
-### Prerequisites
+## 5. Reproduce the Demonstration
 
-- LabVIEW 2026 Community Edition or a compatible installation.
-- Python 3.
-- NumPy.
-- Local TCP networking.
-
-The LabVIEW VIs were developed on macOS.
-
-### 4.1 Start Python Telemetry
+**Requirements:** Python 3, NumPy, LabVIEW 2026 Community Edition (or compatible), and local TCP access.
 
 From the repository root:
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-
-python -m pip install numpy
+python -m pip install -r requirements.txt
 python daq_sim/tcp_server.py
 ```
 
-The Python server provides synthetic pressure telemetry using:
+Then open `TCP_Acquisition.vi` in LabVIEW and run it with the server active. `Simulated_Pressure.vi` and `Flow_Control.vi` can be tested separately.
 
-```text
-Host:       127.0.0.1
-Port:       5000
-Transport:  TCP
-Frame Size: 16 bytes
-```
+## 6. Validation Summary
 
-### 4.2 Start LabVIEW Acquisition
+| Test | Observation |
+|:--|:--|
+| Local pressure simulation | Pressure chart varies near 2.0–2.2 bar |
+| TCP reception | Incoming pressure displayed in LabVIEW |
+| TCP failure | Connection error observed; acquisition stops |
+| Operator / emergency stop | Simulation terminates; emergency state latches during the run |
+| Restart | Latched state resets on new execution |
+| Timestamped logging | **Not fully verified** |
+| End-to-end four-VI integration | **Not verified** |
 
-1. Launch LabVIEW.
-2. Open `TCP_Acquisition.vi`.
-3. Verify the host and port.
-4. Run the VI after starting the Python TCP server.
-5. Observe incoming pressure measurements.
-6. Stop the acquisition loop after testing.
+These are manual software-level checks, not calibrated measurements or hardware acceptance tests.
 
-### 4.3 Test Other VIs
+## 7. Scope
 
-- Open `Simulated_Pressure.vi` to observe pressure generation and overpressure indication.
-- Open `Flow_Control.vi` to test stop inputs and emergency-stop state retention.
-- Open `DAQ_Main.vi` to examine the central monitoring and preliminary logging workflow.
-
-These tests are performed at the component level. Automatic execution of all four VIs as one coordinated system is not currently demonstrated.
-
----
-
-## 5. Testing & Verification
-
-The current prototype was evaluated through manual functional testing.
-
-| Test ID | Test Scenario | Observation |
-|---|---|---|
-| T01 | Nominal pressure simulation | Pressure fluctuates around 2.0–2.2 bar |
-| T02 | Waveform visualization | Pressure chart updates during execution |
-| T03 | TCP telemetry reception | Pressure values received and displayed |
-| T04 | TCP communication failure | Communication error observed; loop terminates |
-| T05 | Operator stop | Simulation loop terminates |
-| T06 | Emergency-stop condition | Stop state is latched during execution |
-| T07 | Restart after shutdown | Latched state returns to initial condition |
-| T08 | Main pressure generation | Basic simulated pressure behavior tested |
-| T09 | Timestamped file logging | Complete output-file verification pending |
-| T10 | End-to-end VI integration | Not yet validated |
-
-These results represent software-level observations, not formal instrumentation acceptance testing.
-
----
-
-## 6. DAQ Scalability & Engineering Considerations
-
-The broader engineering exercise considers an instrumentation system with the following design targets:
-
-| I/O Category | Design Target |
-|---|---:|
-| Slow analog inputs | 50 channels at 1 kHz |
-| Fast analog inputs | 25 channels at 50 kHz |
-| Digital inputs | 30 |
-| Digital outputs | 30 |
-| Analog outputs | 2 |
-
-These targets are used to reason about instrumentation architecture, throughput, buffering, channel grouping, and hardware selection.
-
-They are **not implemented capabilities** of the current software prototype.
-
-### 6.1 Acquisition Throughput
-
-For a representative 16-bit acquisition system:
-
-\[
-R = N \times f_s \times B
-\]
-
-Where:
-
-- \(N\) = number of acquisition channels.
-- \(f_s\) = sampling frequency.
-- \(B\) = bytes per sample.
-
-For the slow analog group:
-
-\[
-50 \times 1000 \times 2 = 100{,}000\ \text{bytes/s}
-\]
-
-For the fast analog group:
-
-\[
-25 \times 50{,}000 \times 2 = 2{,}500{,}000\ \text{bytes/s}
-\]
-
-The combined theoretical raw analog data rate is approximately **2.6 MB/s**, excluding timestamps, metadata, digital channels, transport overhead, and storage-format overhead.
-
-A production DAQ design would require appropriate buffering, independent sampling clocks where necessary, acquisition synchronization, and sustained logging performance.
-
-### 6.2 Engineering Tradeoffs
-
-**Sampling:** Low-rate supervisory measurements and high-rate dynamic measurements have different timing and bandwidth requirements.
-
-**Communication:** TCP offers reliable ordered transport but does not itself guarantee deterministic acquisition timing.
-
-**Logging:** Buffered recording is preferable to uncontrolled file operations inside time-sensitive acquisition loops.
-
-**Control:** Operator-facing monitoring should be separated from independent hardware-level safety mechanisms.
-
-**Scalability:** Multichannel data structures and modular acquisition interfaces would simplify expansion beyond the current single-pressure-channel prototype.
-
----
-
-## 7. Repository Structure
-
-```text
-liquid-rocket-hotfire-daq-sim/
-|
-|-- README.md
-|-- .gitignore
-|
-|-- Simulated_Pressure.vi
-|-- TCP_Acquisition.vi
-|-- Flow_Control.vi
-|-- DAQ_Main.vi
-|
-|-- daq_sim/
-|   `-- tcp_server.py
-|
-`-- docs/
-    |-- ARCHITECTURE.md
-    `-- REQUIREMENTS.md
-```
-
-The four LabVIEW VIs remain at the repository root for straightforward review.
-
----
-
-## 8. Development Roadmap
-
-### Phase 1 — Acquisition and Monitoring
-
-- Develop synthetic pressure telemetry.
-- Establish Python-to-LabVIEW TCP communication.
-- Visualize incoming signals.
-- Demonstrate basic error handling.
-
-**Status:** Initial implementation tested.
-
-### Phase 2 — Simulated Control Logic
-
-- Implement operator-stop behavior.
-- Add emergency-stop input.
-- Maintain a latched shutdown state.
-
-**Status:** Basic Boolean control functionality tested.
-
-### Phase 3 — Central DAQ and Logging
-
-- Develop the main monitoring VI.
-- Add run-specific file naming.
-- Record telemetry with timestamps.
-- Validate file contents and resource cleanup.
-
-**Status:** Initial implementation; complete logging validation pending.
-
-### Phase 4 — System Integration
-
-- Coordinate acquisition, monitoring, control and logging.
-- Introduce multiple telemetry channels.
-- Implement explicit test states.
-- Add configurable faults and alarms.
-
-**Status:** Planned.
-
-### Phase 5 — Hardware and Formal Validation
-
-- Evaluate NI-compatible acquisition hardware.
-- Define sensor calibration and signal conditioning.
-- Validate timing, synchronization, and buffering.
-- Execute repeatable fault-injection tests.
-
-**Status:** Future engineering work.
-
----
-
-## 9. Scope & Safety
-
-This project is intended to demonstrate software architecture and fundamental engineering concepts relevant to ground-test instrumentation.
-
-The current implementation does not provide:
-
-- Validated NI-DAQmx hardware acquisition.
-- Real-time deterministic control.
-- Physical valve actuation.
-- Hardware-qualified pressure or flow measurements.
-- Independent safety interlocks.
-- Certified shutdown mechanisms.
-
-All pressure signals and control responses are simulated.
+The prototype does **not** implement NI-DAQmx device acquisition, deterministic control, physical valve actuation, independent safety interlocks, or a qualified hot-fire test system.
 
 
 ---
@@ -428,54 +204,3 @@ This framework covers synthetic pressure generation, TCP data reception, wavefor
 
 
 ---
-
-
-## LabVIEW Implementation & Validation
-
-The following screenshots document the LabVIEW virtual instruments developed for the software-only hot-fire DAQ demonstrator.
-
-### 1. Simulated Pressure
-
-**Figure 1 — Pressure Monitoring Front Panel**
-
-![Figure 1 - Pressure Monitoring Front Panel](docs/images/Simulated_Pressure_Front_Panel.png)
-
-**Figure 2 — Pressure Simulation Block Diagram**
-
-![Figure 2 - Pressure Simulation Block Diagram](docs/images/Simulated_Pressure_Block_Diagram.png)
-
-### 2. TCP Acquisition
-
-**Figure 3 — TCP Acquisition Front Panel**
-
-![Figure 3 - TCP Acquisition Front Panel](docs/images/TCP_Acquisition_Front_Panel.png)
-
-**Figure 4 — TCP Acquisition Block Diagram**
-
-![Figure 4 - TCP Acquisition Block Diagram](docs/images/TCP_Acquisition_Block_Diagram.png)
-
-**Figure 5 — Python TCP Telemetry Server Output**
-
-![Figure 5 - Python TCP Telemetry Server Output](docs/images/TCP_Acquisition_Server_Log.png)
-
-### 3. Flow Control & Emergency Stop
-
-**Figure 6 — Flow Control Front Panel**
-
-![Figure 6 - Flow Control Front Panel](docs/images/Flow_Control_Front_Panel.png)
-
-**Figure 7 — Emergency Stop Demonstration**
-
-![Figure 7 - Emergency Stop Demonstration](docs/images/Flow_Control_Front_Panel_Emergency_Stop.png)
-
-**Figure 8 — Flow Control Block Diagram**
-
-![Figure 8 - Flow Control Block Diagram](docs/images/Flow_Control_Block_Diagram.png)
-
-### 4. DAQ Main — Integration Work in Progress
-
-**Figure 9 — DAQ Main Block Diagram (Partial Implementation)**
-
-![Figure 9 - DAQ Main Block Diagram](docs/images/DAQ_Main_Block_Diagram.png)
-
-**Implementation status:** Standalone pressure simulation, TCP acquisition and flow-control demonstrations are implemented. Full integration and end-to-end logging in DAQ_Main.vi remain unvalidated. This software demonstrator is not a hardware-qualified safety system.
