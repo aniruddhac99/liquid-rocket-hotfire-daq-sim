@@ -21,7 +21,18 @@ The objective is to demonstrate the fundamental architecture and engineering con
 
 ---
 
-## 1. System Architecture
+---
+
+### Physical System Overview — Liquid Rocket Engine
+
+![NASA Liquid Rocket Engine](docs/images/liquid_rocket_engine_nasa.png)
+
+*Figure 1. Generic liquid-propellant rocket engine schematic.
+Source: [NASA Glenn Research Center — Liquid Rocket Engine](https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/liquid-rocket-engine/).*
+
+---
+
+## 2. System Architecture
 
 ```mermaid
 %%{init: {"theme": "base", "themeVariables": {"fontFamily": "Arial", "fontSize": "14px", "primaryColor": "#f4f7fb", "primaryTextColor": "#172b4d", "primaryBorderColor": "#6b829c", "lineColor": "#66788a", "clusterBkg": "#ffffff", "clusterBorder": "#cbd5e1"}, "flowchart": {"curve": "basis", "nodeSpacing": 30, "rankSpacing": 45}}}%%
@@ -53,7 +64,7 @@ flowchart TB
 
 **Figure 1.** System-level architecture. Solid lines denote the tested TCP telemetry path; dashed lines denote unvalidated integration or logging paths. The pressure and flow-control VIs are independently operated.
 
-## 2. Implementation Status
+## 3. Implementation Status
 
 | Component | Demonstrated function | Status |
 |:--|:--|:--|
@@ -65,9 +76,9 @@ flowchart TB
 
 The demonstrated pressure signal is approximately **2.0–2.2 bar**. The Python source nominally transmits at **10 Hz**. Multichannel acquisition, synchronized test sequencing, and physical NI-DAQ hardware are outside the implemented scope.
 
-## 3. LabVIEW Implementation Evidence
+## 4. LabVIEW Implementation Evidence
 
-### 3.1 Simulated Pressure
+### 4.1 Simulated Pressure
 
 Generates a local synthetic pressure waveform, displays it continuously, and evaluates an overpressure threshold.
 
@@ -79,7 +90,7 @@ Generates a local synthetic pressure waveform, displays it continuously, and eva
 
 *Figure 3. Simulated Pressure — LabVIEW signal generation and threshold-comparison logic.*
 
-### 3.2 TCP Acquisition
+### 4.2 TCP Acquisition
 
 Receives pressure samples from the Python server on `127.0.0.1:5000`. Basic error handling terminates acquisition on a communication fault.
 
@@ -95,7 +106,7 @@ Receives pressure samples from the Python server on `127.0.0.1:5000`. Basic erro
 
 *Figure 6. Python telemetry server — terminal output from the acquisition test.*
 
-### 3.3 Flow Control and Emergency Stop
+### 4.3 Flow Control and Emergency Stop
 
 Implements simulated operator-stop logic and a retained emergency-stop state during execution. No physical valves are actuated.
 
@@ -111,7 +122,7 @@ Implements simulated operator-stop logic and a retained emergency-stop state dur
 
 *Figure 9. Flow Control — Boolean shutdown logic and state retention.*
 
-### 3.4 Main DAQ Prototype
+### 4.4 Main DAQ Prototype
 
 `DAQ_Main.vi` contains preliminary monitoring and file-handling logic. File creation, repeated timestamped writes, and complete integration have **not** been verified.
 
@@ -119,7 +130,7 @@ Implements simulated operator-stop logic and a retained emergency-stop state dur
 
 *Figure 10. DAQ Main — partial integration and logging block diagram.*
 
-## 4. Acquisition Capacity Estimate
+## 5. Acquisition Capacity Estimate
 
 The following values are **design targets**, not measured prototype capacity.
 
@@ -174,7 +185,7 @@ python daq_sim/tcp_server.py
 
 Then open `TCP_Acquisition.vi` in LabVIEW and run it with the server active. `Simulated_Pressure.vi` and `Flow_Control.vi` can be tested separately.
 
-## 6. Validation Summary
+## 7. Validation Summary
 
 | Test | Observation |
 |:--|:--|
@@ -188,18 +199,18 @@ Then open `TCP_Acquisition.vi` in LabVIEW and run it with the server active. `Si
 
 These are manual software-level checks, not calibrated measurements or hardware acceptance tests.
 
-## 7. Scope
+## 8. Scope
 
 The prototype does **not** implement NI-DAQmx device acquisition, deterministic control, physical valve actuation, independent safety interlocks, or a qualified hot-fire test system.
 
 
 ---
 
-## 8. Conclusion
+## 9. Conclusion
 
 `liquid-rocket-hotfire-daq-sim` demonstrates a modular approach to LabVIEW-based data acquisition and supervisory monitoring through four Virtual Instruments and a Python telemetry source.
 
-This framework covers synthetic pressure generation, TCP data reception, waveform visualization, communication-error handling, simulated emergency-stop logic and preliminary main DAQ logging.
+This framework covers synthetic pressure generation, 8 CP data reception, waveform visualization, communication-error handling, simulated emergency-stop logic and preliminary main DAQ logging.
 
 
 
