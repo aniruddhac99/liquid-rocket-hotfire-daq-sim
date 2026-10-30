@@ -23,20 +23,21 @@ The objective is to demonstrate the fundamental architecture and engineering con
 
 ---
 
-## 1. Physical System Overview — Liquid Rocket Engine
+## 1. Physical System Overview — Liquid-Propellant Rocket Engine (LPRE)
 
+![NASA Liquid Rocket Engine](https://github.com/aniruddhac99/liquid-rocket-hotfire-daq-sim/raw/main/docs/images/liquid_rocket_engine_nasa.png)
 
+*Figure 1. Generic liquid-propellant rocket engine (LPRE) schematic illustrating the propellant tanks, pumps, combustion chamber, and exhaust nozzle. Source: [NASA Glenn Research Center — Liquid Rocket Engine](https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/liquid-rocket-engine/).*
 
-![NASA Liquid Rocket Engine](docs/images/liquid_rocket_engine_nasa.png)
+A **Liquid-Propellant Rocket Engine (LPRE)** generates thrust by delivering liquid fuel and oxidizer into a combustion chamber, where combustion produces high-temperature, high-pressure gases that expand through an exhaust nozzle.
 
-*Figure 1. Generic liquid-propellant rocket engine schematic.
-Source: [NASA Glenn Research Center — Liquid Rocket Engine](https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/liquid-rocket-engine/).*
+As illustrated in **Figure 1**, a pump-fed LPRE uses separate fuel and oxidizer tanks, turbopumps, propellant-feed lines, and a combustion chamber. The pumps raise propellant pressure to enable injection into the chamber, while the nozzle accelerates the combustion gases to generate thrust. Pressure and flow conditions throughout the feed system directly influence engine performance and operational stability.
 
-A liquid rocket engine generates thrust by delivering fuel and oxidizer into a combustion chamber, where high-pressure combustion gases expand through a nozzle. During ground-based hot-fire testing, critical parameters such as chamber pressure, propellant-line pressure, temperature, and flow rate must be monitored to evaluate engine behavior and detect abnormal operating conditions.
+During **ground-based LPRE hot-fire testing**, a Data Acquisition (DAQ) system monitors critical parameters, including combustion-chamber pressure, pump discharge pressure, fuel and oxidizer feed-line pressures, temperature, and propellant flow rates. Continuous telemetry helps engineers evaluate engine performance, identify abnormal operating conditions, and support test safety.
 
-The proposed High-Level Design (HLD) models a software-based Data Acquisition (DAQ) and supervisory-control architecture for this environment. It uses Python-generated synthetic pressure telemetry, TCP communication, and LabVIEW Virtual Instruments (VIs) to demonstrate signal acquisition, real-time visualization, threshold monitoring, simulated emergency-stop logic, and preliminary data logging.
+The proposed **High-Level Design (HLD)** models a software-based DAQ and supervisory-control architecture for this LPRE testing environment. It integrates **Python-generated synthetic pressure telemetry, TCP communication, and LabVIEW Virtual Instruments (VIs)** to demonstrate real-time acquisition, pressure visualization, threshold monitoring, communication-error handling, simulated emergency-stop logic, and a preliminary telemetry-logging workflow.
 
-The implementation represents a software-only ground-test demonstrator, with no physical sensors, propulsion hardware, or safety-critical control interfaces connected.
+The implementation is a **software-only LPRE hot-fire DAQ demonstrator**. Although the physical architecture in Figure 1 provides the engineering context, the current simulation does not model actual turbopump dynamics, propellant combustion, or fluid flow, nor does it interface with physical sensors, propulsion hardware, or safety-critical control systems.
 
 ---
 
@@ -216,9 +217,9 @@ The prototype does **not** implement NI-DAQmx device acquisition, deterministic 
 
 ## 9. Conclusion
 
-`liquid-rocket-hotfire-daq-sim` demonstrates a modular approach to LabVIEW-based data acquisition and supervisory monitoring through four Virtual Instruments and a Python telemetry source.
+liquid-rocket-hotfire-daq-sim demonstrates a modular LabVIEW-based Data Acquisition (DAQ) and supervisory-monitoring framework for a simulated Liquid-Propellant Rocket Engine (LPRE) hot-fire test, integrating four Virtual Instruments (VIs) with a Python-based telemetry source.
 
-This framework covers synthetic pressure generation, 8 CP data reception, waveform visualization, communication-error handling, simulated emergency-stop logic and preliminary main DAQ logging.
+The implementation covers synthetic pressure generation, TCP-based telemetry acquisition, real-time waveform visualization, communication-error handling, simulated emergency-stop logic, and preliminary DAQ telemetry logging.
 
 
 
