@@ -23,12 +23,20 @@ The objective is to demonstrate the fundamental architecture and engineering con
 
 ---
 
-### Physical System Overview — Liquid Rocket Engine
+## 1. Physical System Overview — Liquid Rocket Engine
+
+
 
 ![NASA Liquid Rocket Engine](docs/images/liquid_rocket_engine_nasa.png)
 
 *Figure 1. Generic liquid-propellant rocket engine schematic.
 Source: [NASA Glenn Research Center — Liquid Rocket Engine](https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/liquid-rocket-engine/).*
+
+A liquid rocket engine generates thrust by delivering fuel and oxidizer into a combustion chamber, where high-pressure combustion gases expand through a nozzle. During ground-based hot-fire testing, critical parameters such as chamber pressure, propellant-line pressure, temperature, and flow rate must be monitored to evaluate engine behavior and detect abnormal operating conditions.
+
+The proposed High-Level Design (HLD) models a software-based Data Acquisition (DAQ) and supervisory-control architecture for this environment. It uses Python-generated synthetic pressure telemetry, TCP communication, and LabVIEW Virtual Instruments (VIs) to demonstrate signal acquisition, real-time visualization, threshold monitoring, simulated emergency-stop logic, and preliminary data logging.
+
+The implementation represents a software-only ground-test demonstrator, with no physical sensors, propulsion hardware, or safety-critical control interfaces connected.
 
 ---
 
