@@ -21,7 +21,7 @@ The objective is to demonstrate core LPRE ground-test instrumentation, telemetry
 
 ---
 
-## 1. Physical System Overview — Liquid-Propellant Rocket Engine (LPRE)
+## 1. Liquid-Propellant Rocket Engine (LPRE): Overview
 
 ![NASA Liquid Rocket Engine](https://github.com/aniruddhac99/liquid-rocket-hotfire-daq-sim/raw/main/docs/images/liquid_rocket_engine_nasa.png)
 
