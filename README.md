@@ -1,25 +1,23 @@
 # liquid-rocket-hotfire-daq-sim
 
-**A modular LabVIEW–Python framework for simulated liquid rocket engine ground-test data acquisition, telemetry monitoring, flow-control logic, & data logging.**
+**A modular LabVIEW–Python framework for simulated Liquid-Propellant Rocket Engine (LPRE) hot-fire test data acquisition, telemetry monitoring, supervisory control, & logging.**
 
 ## Overview
 
-`liquid-rocket-hotfire-daq-sim` is a software-based engineering framework exploring Data Acquisition (DAQ) and supervisory monitoring workflows for liquid rocket engine hot-fire testing.
+`liquid-rocket-hotfire-daq-sim` explores a software-based **Data Acquisition (DAQ) and supervisory-control system** for ground-based **Liquid-Propellant Rocket Engine (LPRE)** hot-fire testing.
 
 The framework combines:
 
-- **LabVIEW** for instrumentation interfaces, pressure visualization, TCP acquisition, simulated flow control, and data logging.
-- **Python** for synthetic sensor telemetry generation and TCP communication.
-- **Modular Virtual Instruments (VIs)** for acquisition, monitoring, control-state handling, and main DAQ operations.
-- **Software-based validation** for nominal pressure signals, communication errors, and simulated emergency-stop conditions.
+- **LabVIEW:** Pressure visualization, TCP acquisition, simulated flow control, and telemetry logging.
+- **Python:** Synthetic pressure telemetry generation and TCP communication.
+- **Four Virtual Instruments (VIs):** Modular pressure simulation, acquisition, flow-control logic, and main DAQ operations.
+- **Software Validation:** Nominal pressure monitoring, communication-error handling, and simulated emergency-stop conditions.
 
-The objective is to demonstrate the fundamental architecture and engineering considerations of a ground-test DAQ system without requiring physical propulsion or instrumentation hardware.
+The objective is to demonstrate core LPRE ground-test instrumentation, telemetry acquisition, and monitoring workflows without physical rocket-engine hardware.
 
-> **Status:** Four LabVIEW VIs developed: `Simulated_Pressure.vi`, `TCP_Acquisition.vi`, `Flow_Control.vi`, and `DAQ_Main.vi`. Core simulation, TCP acquisition, and stop-control behaviors have been tested. Logging and complete system integration remain partially validated.
+> **Status:** Four LabVIEW VIs developed: `Simulated_Pressure.vi`, `TCP_Acquisition.vi`, `Flow_Control.vi`, and `DAQ_Main.vi`. Core simulation, TCP acquisition, and stop-control behaviors tested. Logging and complete system integration remain partially validated.
 >
-> **Scope:** ground-based static hot-fire test for liquid rocket engine. Not qualified for real propulsion-system control or hardware safety interlocks.
-
----
+> **Scope:** Software-only LPRE ground-test demonstrator. Not qualified for physical propulsion control or safety-critical operations.
 
 ---
 
