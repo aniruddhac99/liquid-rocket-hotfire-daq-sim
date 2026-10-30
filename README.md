@@ -17,7 +17,7 @@ The objective is to demonstrate the fundamental architecture and engineering con
 
 > **Status:** Four LabVIEW VIs developed: `Simulated_Pressure.vi`, `TCP_Acquisition.vi`, `Flow_Control.vi`, and `DAQ_Main.vi`. Core simulation, TCP acquisition, and stop-control behaviors have been tested. Logging and complete system integration remain partially validated.
 >
-> **Scope:** Software-only engineering demonstrator. Not qualified for real propulsion-system control or hardware safety interlocks.
+> **Scope:** ground-based static hot-fire test for liquid rocket engine. Not qualified for real propulsion-system control or hardware safety interlocks.
 
 ---
 
